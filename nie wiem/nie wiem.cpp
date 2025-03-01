@@ -4,6 +4,24 @@
 #include <fstream>
 #include <filesystem>
 #include <cstdlib>  // dla system()
+
+/*
+
+X = NIE ZROBIONE
+✓ = ZROBIONE
+
+RZECZY DO ZROBIENIA!!!!
+##############################
+MOZLIWOSC EDYTOWANIA PODANYCH ZADAN Z LISTY (X)
+DODAWANIE A NIE NADPISYWANIE DO ISTNIEJACYCH PLIKOW Z ZADANIAMI (X)
+WSZYSTKO MA LADNIE SIE WYSWIETLAC (X)
+DODANIE FUNKCJI OZNACZANIA W DANYM PLIKU RZECZY ZROBIONYCH I NIE (X)
+
+
+############################
+*/
+
+
 using namespace std;
 namespace fs = filesystem;
 
@@ -46,6 +64,8 @@ void pokazywanieZadania(const vector<string>& lista) {
     }
 
     cout << "\nTwoje zadania:" << endl;
+
+    // Iteruje po kolei kazde zadanie z listy i je wyswietla
     for (size_t i = 0; i < lista.size(); i++)
     {
         cout << i + 1 << ". " << lista[i] << ".\n";
@@ -67,6 +87,8 @@ void usuwanieZadania(vector<string>& lista) {
         cout << "Niepoprawny numer!" << endl;
         return;
     }
+
+    // Usuwa podane zadanie w numerze odejmujac jeden dopasowujac do indexu listy np. zadanie nr 1 bedzie znajdowac sie w indexie 0 w array
     cout << "Usunieto zadanie: " << "\"" << lista[index - 1] << "\"!" << endl;
     lista.erase(lista.begin() + index - 1);
 }
@@ -83,6 +105,7 @@ void zapiszDoPliku(const vector<string>& lista, string& nazwa) {
     }
 
     for (const string& zadanie : lista) {
+        // Zapisuje zadania z array do pliku !CHWILOWO NADPISUJE WSZYSTKO CO JEST W PLIKU! !!!!! DO NAPRAWY !!!!!!!
         plik << zadanie << endl;
     }
 
@@ -90,11 +113,38 @@ void zapiszDoPliku(const vector<string>& lista, string& nazwa) {
     cout << "Zadania zostaly zapisane do pliku" << endl;
 }
 
+
+void wczytywanieZpliku(vector<string> &lista, string &nazwa) {
+    string sciezka = "C:\\Users\\rogal\\Desktop\\To-Do Listy\\" + nazwa + ".txt";
+
+    ifstream plik(sciezka);
+
+
+        if (!plik) {
+            cout << "Brak pliku lub blad otwierania" << endl;
+            return;
+    }
+        lista.clear();
+        string zadanie;
+
+        
+
+        while (getline(plik, zadanie))
+        {
+            lista.push_back(zadanie);
+        }
+
+        plik.close();
+        cout << "Zadania wczytane z pliku: " << "\"" << nazwa << ".txt\"" << endl;
+
+}
+
 void wyswietlaniePlikow(const string& sciezka) {
     cout << "Pliki w folderze: " << sciezka << endl;
 
+    // PRZY UZYCIU BIBLIOTEKI FILESYSTEM ROBI ITERACJE W FOLDERZE WYSWIETLAJAC PRZY TYM WSZYSTKIE PLIKI BEZ ROZSZERZEŃ
     for (const auto& plik : fs::directory_iterator(sciezka)) {
-        cout << " - " << plik.path().filename() << endl;
+        cout << " - " << plik.path().stem() << endl;
     }
 }
 
@@ -109,15 +159,23 @@ int main() {
         switch (mainWybor) {
         case 1: // DODAWANIE ZADAN
             czyscEkran();  // Wyczyszczenie ekranu tylko przed pokazaniem zadań
+
+
             dodajZadanie(listaZadan);
             break;
         case 2: // POKAZYWANIE ZADAN
             czyscEkran();  
+
+
             pokazywanieZadania(listaZadan);
             break;
         case 3: // USUWANIE ZADAN
             czyscEkran();  
+
+            // Pokazuje obecne zadania w liscie
             pokazywanieZadania(listaZadan);
+
+            // Usuwa zadania z listy
             usuwanieZadania(listaZadan);
             break;
         case 4: // ZAPISYWANIE ZADAN W PLIKU
@@ -126,10 +184,20 @@ int main() {
 
             cout << "Podaj nazwe pliku do ktorego chcesz zapisac zadania: ";
             cin >> nazwaPliku;
+
+            // Zapisuje zadania i tworzy dla nich pliki
             zapiszDoPliku(listaZadan, nazwaPliku);
             break;
         case 5: // WCZYTYWANIE Z PLIKU
-            cout << "Piec" << endl;
+            cout << "Z którego pliku chcesz zaladowac zadania?" << endl;
+
+            wyswietlaniePlikow(folder);
+
+            cin >> nazwaPliku;
+
+            // Wczytuje z pliku
+            wczytywanieZpliku(listaZadan, nazwaPliku);
+
             break;
         case 6:
             cout << "Zegnaj (czesc)" << endl;
