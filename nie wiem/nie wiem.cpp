@@ -32,16 +32,15 @@ namespace fs = filesystem;
 bool potwierdzenie(const string& komunikat);
 
 void czyscEkran() {
-    // Sprawdzenie systemu operacyjnego
 #ifdef _WIN32
     system("cls");  // dla Windows
 #else
     system("clear");  // dla Linux/macOS
 #endif
 }
+
 int wybor() {
     int wybor;
-
     cout << "[1] Dodaj zadanie do listy" << endl;
     cout << "[2] Pokaz zadania z listy" << endl;
     cout << "[3] Usun zadanie z listy" << endl;
@@ -52,38 +51,36 @@ int wybor() {
     cin.ignore();
     return wybor;
 }
+
 void dodajZadanie(vector<string>& lista) {
     string zadanie;
-    cout << "Podaj tresc zadania" << endl;
+    cout << "Podaj tresc zadania: ";
     getline(cin, zadanie);
     lista.push_back(zadanie);
-    cout << "Dodano zadanie: " << "\"" << zadanie << "\"" << endl;
+    cout << "Dodano zadanie: \"" << zadanie << "\"" << endl;
 }
+
 void pokazywanieZadania(const vector<string>& lista) {
-    if (lista.empty())
-    {
+    if (lista.empty()) {
         cout << "Brak zadan na liscie!" << endl;
         return;
     }
 
     cout << "Twoje zadania:" << endl;
-
-    // Iteruje po kolei kazde zadanie z listy i je wyswietla
-    for (size_t i = 0; i < lista.size(); i++)
-    {
-        cout << i + 1 << ". " << lista[i] << ".\n";
+    for (size_t i = 0; i < lista.size(); i++) {
+        cout << i + 1 << ". " << lista[i] << "." << endl;
     }
     cout << endl;
 }
+
 void usuwanieZadania(vector<string>& lista) {
-    if (lista.empty())
-    {
+    if (lista.empty()) {
         cout << "Brak zadan na liscie!" << endl;
         return;
     }
 
     int index;
-    cout << "Podaj numer zadanie do usuniecia: ";
+    cout << "Podaj numer zadania do usuniecia: ";
     cin >> index;
 
     if (index < 1 || index > lista.size()) {
@@ -91,114 +88,97 @@ void usuwanieZadania(vector<string>& lista) {
         return;
     }
 
-    // Usuwa podane zadanie w numerze odejmujac jeden dopasowujac do indexu listy np. zadanie nr 1 bedzie znajdowac sie w indexie 0 w array
-    cout << "Usunieto zadanie: " << "\"" << lista[index - 1] << "\"!" << endl;
+    cout << "Usunieto zadanie: \"" << lista[index - 1] << "\"!" << endl;
     lista.erase(lista.begin() + index - 1);
 }
+
 void zapiszDoPliku(const vector<string>& lista, string& nazwa) {
     string sciezka = "C:\\Users\\rogal\\Desktop\\To-Do Listy\\" + nazwa + ".txt";
-
     ofstream plik(sciezka, ios::app);
 
-    if (!plik)
-    {
+    if (!plik) {
         cout << "Otwieranie pliku nie powiodlo sie" << endl;
         return;
     }
 
     for (const string& zadanie : lista) {
-        // Zapisuje zadania z array do pliku !CHWILOWO NADPISUJE WSZYSTKO CO JEST W PLIKU! !!!!! DO NAPRAWY !!!!!!!
         plik << zadanie << endl;
     }
 
     plik.close();
-    cout << "Zadania zostaly zapisane do pliku" << endl;
+    cout << "Zadania zostaly zapisane do pliku." << endl;
 }
-void wczytywanieZpliku(vector<string> &lista, string &nazwa) {
-    string sciezka = "C:\\Users\\rogal\\Desktop\\To-Do Listy\\" + nazwa + ".txt";
 
+void wczytywanieZpliku(vector<string>& lista, string& nazwa) {
+    string sciezka = "C:\\Users\\rogal\\Desktop\\To-Do Listy\\" + nazwa + ".txt";
     ifstream plik(sciezka);
 
-        if (!plik) {
-            cout << "Brak pliku lub blad otwierania" << endl;
-            return;
+    if (!plik) {
+        cout << "Brak pliku lub blad otwierania" << endl;
+        return;
     }
-        lista.clear();
-        string zadanie;
 
-        while (getline(plik, zadanie))
-        {
-            lista.push_back(zadanie);
-        }
+    lista.clear();
+    string zadanie;
+    while (getline(plik, zadanie)) {
+        lista.push_back(zadanie);
+    }
 
-        plik.close();
-        cout << "Zadania wczytane z pliku: " << "\"" << nazwa << ".txt\"" << endl;
-
+    plik.close();
+    cout << "Zadania wczytane z pliku: \"" << nazwa << ".txt\"" << endl;
 }
+
 void wyswietlaniePlikow(const string& sciezka) {
     cout << "Pliki w folderze: " << sciezka << endl;
-
-    // PRZY UZYCIU BIBLIOTEKI FILESYSTEM ROBI ITERACJE W FOLDERZE WYSWIETLAJAC PRZY TYM WSZYSTKIE PLIKI BEZ ROZSZERZEŃ
     for (const auto& plik : fs::directory_iterator(sciezka)) {
         cout << " - " << plik.path().stem() << endl;
     }
 }
-void wyczyscCalaListe(vector<string>&lista) {
-    if (lista.empty())
-    {
+
+void wyczyscCalaListe(vector<string>& lista) {
+    if (lista.empty()) {
         cout << "Brak zadan na liscie!" << endl;
         return;
     }
 
     if (potwierdzenie("Czy na pewno chcesz usunac wszystkie zadania z listy?: ")) {
         lista.clear();
-        cout << "Wszystkie zadania zostaly usuniete. " << endl;
+        cout << "Wszystkie zadania zostaly usuniete." << endl;
     }
     else {
         cout << "Anulowano operacje." << endl;
     }
 
-    // Czyszczenie bufora wejścia dla pewności
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-
 }
+
 bool potwierdzenie(const string& komunikat) {
     char decyzja;
     cout << komunikat << " (T/N): ";
     cin >> decyzja;
-
-    //Konwersja do wielkiej litery, aby działało dla "t" i "T"
     decyzja = toupper(decyzja);
-
-    return (decyzja == 'T');  // Zwraca true, jeśli użytkownik wpisał 'T'
+    return (decyzja == 'T');
 }
 
 int main() {
     string nazwaPliku;
     vector<string> listaZadan;
-    string folder = "C:\\Users\\rogal\\Desktop\\To-Do Listy";  // Ustaw ścieżkę folderu
+    string folder = "C:\\Users\\rogal\\Desktop\\To-Do Listy";
     int wyborUsuniecia;
 
-
     while (true) {
-
         int mainWybor = wybor();
+        czyscEkran();
+
         switch (mainWybor) {
-        case 1:                             // DODAWANIE ZADAN
-            czyscEkran();  // Wyczyszczenie ekranu tylko przed pokazaniem zadań
-
-
+        case 1:
             dodajZadanie(listaZadan);
-
             break;
-        case 2: // POKAZYWANIE ZADAN
-            czyscEkran();  
+        case 2:
             pokazywanieZadania(listaZadan);
             break;
-        case 3:                             // USUWANIE ZADAN
-            czyscEkran();  
+        case 3:
             cout << "Co chcesz zrobic?" << endl;
             cout << "[1] Usunac wszystkie zadania z listy " << endl;
             cout << "[2] Usunac pojedyncze zadania z listy wybrane przez ciebie" << endl;
@@ -209,42 +189,28 @@ int main() {
             else if (wyborUsuniecia == 2) {
                 pokazywanieZadania(listaZadan);
                 usuwanieZadania(listaZadan);
-
             }
             else {
-                cout << "wybierz jedna z opcji";
-                return 0;
+                cout << "Wybierz jedna z opcji." << endl;
             }
-
             break;
-        case 4:                            // ZAPISYWANIE ZADAN W PLIKU
-            // Wyświetlanie dostępnych plików przed zapisaniem
+        case 4:
             wyswietlaniePlikow(folder);
-
             cout << "Podaj nazwe pliku do ktorego chcesz zapisac zadania: ";
             cin >> nazwaPliku;
-
-            // Zapisuje zadania i tworzy dla nich pliki
             zapiszDoPliku(listaZadan, nazwaPliku);
             break;
-        case 5:                             // WCZYTYWANIE Z PLIKU
-            cout << "Z którego pliku chcesz zaladowac zadania?" << endl;
-
+        case 5:
             wyswietlaniePlikow(folder);
-
+            cout << "Z ktorego pliku chcesz zaladowac zadania?" << endl;
             cin >> nazwaPliku;
-
-            // Wczytuje z pliku
             wczytywanieZpliku(listaZadan, nazwaPliku);
-
             break;
         case 6:
-            cout << "Zegnaj (czesc)" << endl;
+            cout << "Zegnaj!" << endl;
             return 0;
         default:
             cout << "Prosze podac jedna z opcji" << endl;
         }
     }
-
-    return 0;
 }
